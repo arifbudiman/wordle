@@ -7,11 +7,14 @@
 #define RESET "\033[0m"
 #define CURSOR_DOWN_ONE_LEFT_FIVE "\033[1B\033[5D"
 #define CURSOR_UP_TWO "\033[2A"
+#define WORDLIST "wordlist.txt"
+#define ANSWERLIST "answerlist.txt"
 
 #include <algorithm>
 #include <string>
 #include <fstream>
 #include <cctype>
+#include <vector>
 
 std::string pickRandomWord(std::string filename)
 {
@@ -88,9 +91,16 @@ bool isValidGuess(std::string word, std::string fileName)
     return false;
 }
 
+bool isValidGuess(std::string word)
+{
+    return isValidGuess(word, WORDLIST);
+}
+
 void printHint(std::string guess, std::string answer)
 {
     std::string color;
+
+    std::vector<char> charactersNotUsed;
 
     for (int i = 0; i < guess.length(); i++)
     {
@@ -108,6 +118,7 @@ void printHint(std::string guess, std::string answer)
         else
         {
             color = GREY;
+            charactersNotUsed.push_back(guess[i]);
         }
 
         std::cout << color << " --- "  << CURSOR_DOWN_ONE_LEFT_FIVE;
@@ -125,6 +136,49 @@ void printHint(std::string guess, std::string answer)
             std::cout << std::endl;
         }
     }
+}
+
+void playWordle()
+{
+    int numberOfTry = 0;
+
+    std::string answer = pickRandomWord(ANSWERLIST);
+
+    while (numberOfTry < 6)
+    {
+        std::string guess;
+        std::cout << "Please enter your guess: ";
+        std::cin >> guess;
+
+        // transform guess to lowercase
+        std::transform(guess.begin(), guess.end(), guess.begin(), ::tolower);
+
+        if (guess.length() != 5)
+        {
+            std::cout << "Your guess must contain 5 letters." << std::endl;
+        }
+        else if (!isValidGuess(guess))
+        {
+            std::cout << "Your guess is not a valid word." << std::endl;
+        }
+        else
+        {
+            numberOfTry++;
+
+            printHint(guess, answer);
+
+            // TODO: log the guess in a temporary file so that we know what letters have been used.
+
+            if (guess.compare(answer) == 0)
+            {
+                // TODO: log the statistic in a file
+                std::cout << "Guessed in " << numberOfTry << " tries." << std::endl;
+                break;
+            }
+        }
+    }
+
+    
 }
 
 #endif

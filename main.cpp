@@ -10,10 +10,9 @@ using namespace std;
 
 int main()
 {
+    /*
     string answer = pickRandomWord(ANSWERLIST);
     string guess = "crown";
-
-    cout << CLEAR_SCREEN << HOME;
 
     if (isValidGuess(guess, WORDLIST))
     {
@@ -29,6 +28,10 @@ int main()
     {
         cout << guess << " is NOT a valid guess." << endl;
     }
+    */
+    cout << CLEAR_SCREEN << HOME;
     
+    playWordle();
+
     return 0;
 }

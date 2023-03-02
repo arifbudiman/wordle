@@ -5,16 +5,80 @@
 #define YELLOW "\033[93m"
 #define GREY "\033[90m"
 #define RESET "\033[0m"
+
 #define CURSOR_DOWN_ONE_LEFT_FIVE "\033[1B\033[5D"
 #define CURSOR_UP_TWO "\033[2A"
+
 #define WORDLIST "wordlist.txt"
 #define ANSWERLIST "answerlist.txt"
+#define PLAYLOG "play.log"
 
 #include <algorithm>
 #include <string>
 #include <fstream>
 #include <cctype>
 #include <vector>
+#include <iostream>
+
+void showStatistics(std::string filename)
+{
+    int totalPlayed = 0;
+    int totalWin = 0;
+    int percentWin = 0;
+    int currentStreak = 0;
+    int maxStreak = 0;
+
+    std::ifstream ifstream(filename);
+    std::string line;
+    while (getline(ifstream, line))
+    {
+        totalPlayed++;
+        if (line.find("true", 0) != std::string::npos)
+        {
+            totalWin++;
+            currentStreak++;
+            if (currentStreak > maxStreak)
+            {
+                maxStreak = currentStreak;
+            }
+        }
+        else
+        {
+            currentStreak = 0;
+        }
+    }
+
+    percentWin = totalWin / (double)totalPlayed * 100;
+
+    std::cout << "Played: " << totalPlayed << std::endl;
+    std::cout << "Win: " << percentWin << "%" << std::endl;
+    std::cout << "Current streak: " << currentStreak << std::endl;
+    std::cout << "Max streak: " << maxStreak << std::endl;
+
+    ifstream.close();
+}
+
+void showStatistics()
+{
+    showStatistics(PLAYLOG);
+}
+
+void logThePlay(bool isWinning, int numOfTries, std::string filename)
+{
+    // open a file for appending
+    std::ofstream logfile(filename, std::ios_base::app);
+
+    if (logfile.is_open())
+    {
+        logfile << (isWinning ? "true" : "false") << "," << numOfTries << std::endl;
+        logfile.close();
+    }
+}
+
+void logThePlay(bool isWinning, int numOfTries)
+{
+    logThePlay(isWinning, numOfTries, PLAYLOG);
+}
 
 std::string pickRandomWord(std::string filename)
 {

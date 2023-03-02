@@ -5,6 +5,7 @@
 #define HOME "\033[H"
 #define WORDLIST "wordlist.txt"
 #define ANSWERLIST "answerlist.txt"
+#define PLAYLOG "play.log"
 
 using namespace std;
 
@@ -29,9 +30,15 @@ int main()
         cout << guess << " is NOT a valid guess." << endl;
     }
     */
-    cout << CLEAR_SCREEN << HOME;
-    
-    playWordle();
+   
+    //cout << CLEAR_SCREEN << HOME;
+    //playWordle();
+
+    // logThePlay(true, 3);
+    // logThePlay(true, 4);
+    // logThePlay(true, 3);
+
+    showStatistics();
 
     return 0;
 }

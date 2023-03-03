@@ -14,6 +14,7 @@
 #define WORDLIST "wordlist.txt"
 #define ANSWERLIST "answerlist.txt"
 #define PLAYLOG "play.log"
+#define GUESSLOG "guess.log"
 
 #include <algorithm>
 #include <string>
@@ -63,6 +64,22 @@ void showStatistics(std::string filename)
 void showStatistics()
 {
     showStatistics(PLAYLOG);
+}
+
+void logTheGuess(std::string guess, std::string filename, std::ios_base::openmode openMode)
+{
+    std::ofstream logfile(filename, openMode);
+
+    if (logfile.is_open())
+    {
+        logfile << guess << std::endl;
+        logfile.close();
+    }
+}
+
+void logTheGuess(std::string guess, std::ios_base::openmode openMode)
+{
+    logTheGuess(guess, GUESSLOG, openMode);
 }
 
 void logThePlay(bool isWinning, int numOfTries, std::string filename)
@@ -247,7 +264,15 @@ void playWordle()
 
             printHint(guesses, answer);
 
-            // TODO: log the guess in a temporary file so we can use it to colorize the keyboard.
+            // log the guess in a temporary file so we can use it to colorize the keyboard.
+            if (numberOfTry == 1)
+            {
+                logTheGuess(guess, std::ios_base::trunc);
+            }
+            else
+            {
+                logTheGuess(guess, std::ios_base::app);
+            }
 
             // winner: user guessed correctly
             if (guess.compare(answer) == 0)
@@ -261,7 +286,7 @@ void playWordle()
         }
     }
 
-    // loser: already tried 6 times
+    // loser: no correct guesses after 6 tries
     logThePlay(false, 0);
 
     std::cout << "Answer: " << answer << std::endl;

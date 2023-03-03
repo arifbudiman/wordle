@@ -31,14 +31,14 @@ int main()
     }
     */
    
-    //cout << CLEAR_SCREEN << HOME;
-    //playWordle();
+    cout << CLEAR_SCREEN << HOME;
+    playWordle();
 
     // logThePlay(true, 3);
     // logThePlay(true, 4);
     // logThePlay(true, 3);
 
-    showStatistics();
+    // showStatistics();
 
     return 0;
 }

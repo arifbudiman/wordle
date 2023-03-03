@@ -5,6 +5,8 @@
 #define YELLOW "\033[93m"
 #define GREY "\033[90m"
 #define RESET "\033[0m"
+#define CLEAR_SCREEN "\033[2J"
+#define HOME "\033[H"
 
 #define CURSOR_DOWN_ONE_LEFT_FIVE "\033[1B\033[5D"
 #define CURSOR_UP_TWO "\033[2A"
@@ -197,8 +199,16 @@ void printHint(std::string guess, std::string answer)
         // otherwise (if this is the last character), put the cursor in the next line (put a line break)
         else
         {
-            std::cout << std::endl;
+            std::cout << std::endl << std::endl;
         }
+    }
+}
+
+void printHint(std::vector<std::string> guesses, std::string answer)
+{
+    for (int i = 0; i < guesses.size(); i++)
+    {
+        printHint(guesses[i], answer);
     }
 }
 
@@ -207,6 +217,8 @@ void playWordle()
     int numberOfTry = 0;
 
     std::string answer = pickRandomWord(ANSWERLIST);
+
+    std::vector<std::string> guesses;
 
     while (numberOfTry < 6)
     {
@@ -229,14 +241,21 @@ void playWordle()
         {
             numberOfTry++;
 
-            printHint(guess, answer);
+            //printHint(guess, answer);
+
+            std::cout << CLEAR_SCREEN << HOME;
+            guesses.push_back(guess);
+            printHint(guesses, answer);
 
             // TODO: log the guess in a temporary file so that we know what letters have been used.
 
             if (guess.compare(answer) == 0)
             {
-                // TODO: log the statistic in a file
+                // log the play statistics in a file
+                logThePlay(true, guesses.size());
+
                 std::cout << "Guessed in " << numberOfTry << " tries." << std::endl;
+                
                 break;
             }
         }

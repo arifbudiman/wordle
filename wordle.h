@@ -22,33 +22,42 @@
 #include <cctype>
 #include <vector>
 #include <iostream>
+#include <limits>
 
 void showStatistics(std::string filename)
 {
+    std::cout << CLEAR_SCREEN << HOME;
+
     int totalPlayed = 0;
     int totalWin = 0;
     int percentWin = 0;
     int currentStreak = 0;
     int maxStreak = 0;
 
-    std::ifstream ifstream(filename);
-    std::string line;
-    while (getline(ifstream, line))
+    std::ifstream statFile(filename);
+
+    if (statFile.is_open())
     {
-        totalPlayed++;
-        if (line.find("true", 0) != std::string::npos)
+        std::string line;
+        while (getline(statFile, line))
         {
-            totalWin++;
-            currentStreak++;
-            if (currentStreak > maxStreak)
+            totalPlayed++;
+            if (line.find("true", 0) != std::string::npos)
             {
-                maxStreak = currentStreak;
+                totalWin++;
+                currentStreak++;
+                if (currentStreak > maxStreak)
+                {
+                    maxStreak = currentStreak;
+                }
+            }
+            else
+            {
+                currentStreak = 0;
             }
         }
-        else
-        {
-            currentStreak = 0;
-        }
+
+        statFile.close();
     }
 
     percentWin = totalWin / (double)totalPlayed * 100;
@@ -56,9 +65,10 @@ void showStatistics(std::string filename)
     std::cout << "Played: " << totalPlayed << std::endl;
     std::cout << "Win: " << percentWin << "%" << std::endl;
     std::cout << "Current streak: " << currentStreak << std::endl;
-    std::cout << "Max streak: " << maxStreak << std::endl;
+    std::cout << "Max streak: " << maxStreak << std::endl << std::endl;
 
-    ifstream.close();
+    std::cout << "Press Enter to Continue ";
+    std::cin.ignore();
 }
 
 void showStatistics()
@@ -233,6 +243,8 @@ void printHint(std::vector<std::string> guesses, std::string answer)
 
 void playWordle()
 {
+    std::cout << CLEAR_SCREEN << HOME;
+
     std::string answer = pickRandomWord(ANSWERLIST);
 
     std::vector<std::string> guesses;
@@ -280,7 +292,10 @@ void playWordle()
                 logThePlay(true, guesses.size());
 
                 std::cout << "Guessed in " << guesses.size() << " tries." << std::endl;
-                
+
+                std::cout << "Press Enter to Continue ";
+                std::cin.ignore(INT_MAX);
+
                 return;
             }
         }
@@ -289,7 +304,10 @@ void playWordle()
     // loser: no correct guesses after 6 tries
     logThePlay(false, 0);
 
-    std::cout << "Answer: " << answer << std::endl;
+    std::cout << "The answer is: " << answer << std::endl << std::endl;
+
+    std::cout << "Press Enter to Continue ";
+    std::cin.ignore(INT_MAX);
 }
 
 #endif

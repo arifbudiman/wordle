@@ -11,34 +11,36 @@ using namespace std;
 
 int main()
 {
-    /*
-    string answer = pickRandomWord(ANSWERLIST);
-    string guess = "crown";
+    int choice;
 
-    if (isValidGuess(guess, WORDLIST))
+    do
     {
-        // cout << guess << " is a valid guess." << endl;
-        printHint(guess, answer);
-        printHint("paced", answer);
-        printHint("acute", answer);
-        printHint("enact", answer);
-        printHint("trace", answer);
-        printHint("teach", answer);
-    }
-    else
-    {
-        cout << guess << " is NOT a valid guess." << endl;
-    }
-    */
-   
-    cout << CLEAR_SCREEN << HOME;
-    playWordle();
+        cout << CLEAR_SCREEN << HOME << endl
+             << " 1 - Play Wordle\n"
+             << " 2 - Display Statistics\n"
+             << " 3 - Exit\n\n"
+             << " Enter your choice and press return: ";
+        cin >> choice;
+        cin.clear();
+        cin.get();
 
-    // logThePlay(true, 3);
-    // logThePlay(true, 4);
-    // logThePlay(true, 3);
-
-    // showStatistics();
+        switch (choice)
+        {
+        case 1:
+            playWordle();
+            break;
+        case 2:
+            showStatistics();
+            break;
+        case 3:
+            cout << "End of Program.\n";
+            break;
+        default:
+            cout << "Not a Valid Choice. \n"
+                 << "Choose again.\n";
+            break;
+        }
+    } while (choice != 3);
 
     return 0;
 }

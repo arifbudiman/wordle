@@ -206,6 +206,8 @@ void printHint(std::string guess, std::string answer)
 
 void printHint(std::vector<std::string> guesses, std::string answer)
 {
+    std::cout << CLEAR_SCREEN << HOME;
+
     for (int i = 0; i < guesses.size(); i++)
     {
         printHint(guesses[i], answer);
@@ -214,11 +216,11 @@ void printHint(std::vector<std::string> guesses, std::string answer)
 
 void playWordle()
 {
-    int numberOfTry = 0;
-
     std::string answer = pickRandomWord(ANSWERLIST);
 
     std::vector<std::string> guesses;
+
+    int numberOfTry = 0;
 
     while (numberOfTry < 6)
     {
@@ -241,27 +243,28 @@ void playWordle()
         {
             numberOfTry++;
 
-            //printHint(guess, answer);
-
-            std::cout << CLEAR_SCREEN << HOME;
             guesses.push_back(guess);
+
             printHint(guesses, answer);
 
-            // TODO: log the guess in a temporary file so that we know what letters have been used.
+            // TODO: log the guess in a temporary file so we can use it to colorize the keyboard.
 
+            // winner: user guessed correctly
             if (guess.compare(answer) == 0)
             {
-                // log the play statistics in a file
                 logThePlay(true, guesses.size());
 
-                std::cout << "Guessed in " << numberOfTry << " tries." << std::endl;
+                std::cout << "Guessed in " << guesses.size() << " tries." << std::endl;
                 
-                break;
+                return;
             }
         }
     }
 
-    
+    // loser: already tried 6 times
+    logThePlay(false, 0);
+
+    std::cout << "Answer: " << answer << std::endl;
 }
 
 #endif

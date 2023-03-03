@@ -293,8 +293,7 @@ void playWordle()
 
                 std::cout << "Guessed in " << guesses.size() << " tries." << std::endl;
 
-                std::cout << "Press Enter to Continue ";
-                std::cin.ignore(INT_MAX);
+                system("pause");
 
                 return;
             }
@@ -306,8 +305,7 @@ void playWordle()
 
     std::cout << "The answer is: " << answer << std::endl << std::endl;
 
-    std::cout << "Press Enter to Continue ";
-    std::cin.ignore(INT_MAX);
+    system("pause");
 }
 
 #endif

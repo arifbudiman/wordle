@@ -92,21 +92,21 @@ void logTheGuess(std::string guess, std::ios_base::openmode openMode)
     logTheGuess(guess, GUESSLOG, openMode);
 }
 
-void logThePlay(bool isWinning, int numOfTries, std::string filename)
+void logThePlay(std::string guessWord, bool isWinning, int numOfTries, std::string filename)
 {
     // open a file for appending
     std::ofstream logfile(filename, std::ios_base::app);
 
     if (logfile.is_open())
     {
-        logfile << (isWinning ? "true" : "false") << "," << numOfTries << std::endl;
+        logfile << guessWord << "," << (isWinning ? "true" : "false") << "," << numOfTries << std::endl;
         logfile.close();
     }
 }
 
-void logThePlay(bool isWinning, int numOfTries)
+void logThePlay(std::string guessWord, bool isWinning, int numOfTries)
 {
-    logThePlay(isWinning, numOfTries, PLAYLOG);
+    logThePlay(guessWord, isWinning, numOfTries, PLAYLOG);
 }
 
 std::string pickRandomWord(std::string filename)
@@ -241,81 +241,12 @@ void printHint(std::vector<std::string> guesses, std::string answer)
     }
 }
 
-void playWordle()
-{
-    std::cout << CLEAR_SCREEN << HOME;
-
-    std::string answer = pickRandomWord(ANSWERLIST);
-
-    std::vector<std::string> guesses;
-
-    int numberOfTry = 0;
-
-    while (numberOfTry < 6)
-    {
-        std::string guess;
-        std::cout << "Please enter your guess: ";
-        std::cin >> guess;
-
-        // transform guess to lowercase
-        std::transform(guess.begin(), guess.end(), guess.begin(), ::tolower);
-
-        if (guess.length() != 5)
-        {
-            std::cout << "Your guess must contain 5 letters." << std::endl;
-        }
-        else if (!isValidGuess(guess))
-        {
-            std::cout << "Your guess is not a valid word." << std::endl;
-        }
-        else
-        {
-            numberOfTry++;
-
-            guesses.push_back(guess);
-
-            printHint(guesses, answer);
-
-            // log the guess in a temporary file so we can use it to colorize the keyboard.
-            if (numberOfTry == 1)
-            {
-                logTheGuess(guess, std::ios_base::trunc);
-            }
-            else
-            {
-                logTheGuess(guess, std::ios_base::app);
-            }
-
-            // winner: user guessed correctly
-            if (guess.compare(answer) == 0)
-            {
-                logThePlay(true, guesses.size());
-
-                std::cout << "Guessed in " << guesses.size() << " tries." << std::endl;
-
-                system("pause");
-
-                return;
-            }
-        }
-    }
-
-    // loser: no correct guesses after 6 tries
-    logThePlay(false, 0);
-
-    std::cout << "The answer is: " << answer << std::endl << std::endl;
-
-    system("pause");
-}
-
 std::string dedupe(std::string str)
 {
     std::sort(str.begin(), str.end());
     str.erase(std::unique(str.begin(), str.end()), str.end());
     return str;
 }
-
-
 
 void printKeyboardHint(std::vector<std::string> guesses, std::string answer)
 {
@@ -356,9 +287,9 @@ void printKeyboardHint(std::vector<std::string> guesses, std::string answer)
         }
     }
 
-    std::cout << CLEAR_SCREEN << HOME;
-
     std::vector<std::string> keys = {"qwertyuiop", "asdfghjkl", "zxcvbnm"};
+
+    // std::cout << CLEAR_SCREEN << HOME;
 
     // loop for keyboard rows
     for (int i = 0; i < keys.size(); i++)
@@ -392,9 +323,9 @@ void printKeyboardHint(std::vector<std::string> guesses, std::string answer)
                 color = GREY;
             }
 
-            std::cout << color << " --- " << CURSOR_DOWN_ONE_LEFT_FIVE;
-            std::cout << "| " << keys[i][j] << " |" << CURSOR_DOWN_ONE_LEFT_FIVE;
-            std::cout << " --- " << RESET;
+            std::cout << color << " --- " << CURSOR_DOWN_ONE_LEFT_FIVE
+                << "| " << keys[i][j] << " |" << CURSOR_DOWN_ONE_LEFT_FIVE
+                << " --- " << RESET;
 
             // if this isn't the last charcter in the row
             if (j < keys[i].length() -1)
@@ -404,6 +335,75 @@ void printKeyboardHint(std::vector<std::string> guesses, std::string answer)
         }
         std::cout << std::endl;
     }
+}
+
+void playWordle()
+{
+    std::cout << CLEAR_SCREEN << HOME;
+
+    std::string answer = pickRandomWord(ANSWERLIST);
+
+    std::vector<std::string> guesses;
+
+    int numberOfTry = 0;
+
+    while (numberOfTry < 6)
+    {
+        std::string guess;
+        std::cout << "Please enter your guess: ";
+        std::cin >> guess;
+
+        // transform guess to lowercase
+        std::transform(guess.begin(), guess.end(), guess.begin(), ::tolower);
+
+        if (guess.length() != 5)
+        {
+            std::cout << "Your guess must contain 5 letters." << std::endl;
+        }
+        else if (!isValidGuess(guess))
+        {
+            std::cout << "Your guess is not a valid word." << std::endl;
+        }
+        else
+        {
+            numberOfTry++;
+
+            guesses.push_back(guess);
+
+            printHint(guesses, answer);
+
+            printKeyboardHint(guesses, answer);
+
+            // log the guess in a temporary file so we can use it to colorize the keyboard.
+            if (numberOfTry == 1)
+            {
+                logTheGuess(guess, std::ios_base::trunc);
+            }
+            else
+            {
+                logTheGuess(guess, std::ios_base::app);
+            }
+
+            // winner: user guessed correctly
+            if (guess.compare(answer) == 0)
+            {
+                logThePlay(guess, true, guesses.size());
+
+                std::cout << "Guessed in " << guesses.size() << " tries." << std::endl;
+
+                system("pause");
+
+                return;
+            }
+        }
+    }
+
+    // loser: no correct guesses after 6 tries
+    logThePlay(answer, false, 0);
+
+    std::cout << "The answer is: " << answer << std::endl << std::endl;
+
+    system("pause");
 }
 
 #endif

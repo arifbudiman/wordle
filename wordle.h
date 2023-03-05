@@ -308,4 +308,102 @@ void playWordle()
     system("pause");
 }
 
+std::string dedupe(std::string str)
+{
+    std::sort(str.begin(), str.end());
+    str.erase(std::unique(str.begin(), str.end()), str.end());
+    return str;
+}
+
+
+
+void printKeyboardHint(std::vector<std::string> guesses, std::string answer)
+{
+    std::string guessedAbsent;
+    std::string guessedMisplaced;
+    std::string guessedCorrect;
+
+    // get all letters that have been guessed and deduplicate them
+    std::string allGuessedLetters;
+    for (int i = 0; i < guesses.size(); i++)
+    {
+        allGuessedLetters += guesses[i];
+    }
+    allGuessedLetters = dedupe(allGuessedLetters);
+
+    // get letters that have been guessed but are absent in the answer
+    for (int i = 0; i < allGuessedLetters.length(); i++)
+    {
+        if (answer.find(allGuessedLetters[i] == std::string::npos))
+        {
+            guessedAbsent.push_back(allGuessedLetters[i]);
+        }
+    }
+    
+    // get correct letters and misplaced letters
+    std::string lastGuess = guesses.back();
+    for (int i = 0; i < lastGuess.length(); i++)
+    {
+        // correct letter
+        if (lastGuess[i] == answer[i])
+        {
+            guessedCorrect.push_back(lastGuess[i]);
+        }
+        // letter exist but misplaced
+        else if (answer.find(lastGuess[i]) != std::string::npos)
+        {
+            guessedMisplaced.push_back(lastGuess[i]);
+        }
+    }
+
+    std::cout << CLEAR_SCREEN << HOME;
+
+    std::vector<std::string> keys = {"qwertyuiop", "asdfghjkl", "zxcvbnm"};
+
+    // loop for keyboard rows
+    for (int i = 0; i < keys.size(); i++)
+    {
+        // if this is the 2nd row
+        if (i == 1)
+        {
+            std::cout << "  ";
+        }
+        // if this is the 3rd row
+        else if (i == 2)
+        {
+            std::cout << "       ";
+        }
+
+        // loop for the all the letters in the current row
+        for (int j = 0; j < keys[i].length(); j++)
+        {
+            // TODO: logic to determine color
+            std::string color;
+            if (guessedCorrect.find(keys[i][j]) != std::string::npos)
+            {
+                color = GREEN;
+            }
+            else if (guessedMisplaced.find(keys[i][j]) != std::string::npos)
+            {
+                color = YELLOW;
+            }
+            else if (guessedAbsent.find(keys[i][j]) != std::string::npos)
+            {
+                color = GREY;
+            }
+
+            std::cout << color << " --- " << CURSOR_DOWN_ONE_LEFT_FIVE;
+            std::cout << "| " << keys[i][j] << " |" << CURSOR_DOWN_ONE_LEFT_FIVE;
+            std::cout << " --- " << RESET;
+
+            // if this isn't the last charcter in the row
+            if (j < keys[i].length() -1)
+            {
+                std::cout << CURSOR_UP_TWO;
+            }
+        }
+        std::cout << std::endl;
+    }
+}
+
 #endif

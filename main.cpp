@@ -11,36 +11,42 @@ using namespace std;
 
 int main()
 {
+
     int choice;
 
-    do
-    {
-        cout << CLEAR_SCREEN << HOME << endl
-             << " 1 - Play Wordle\n"
-             << " 2 - Display Statistics\n"
-             << " 3 - Exit\n\n"
-             << " Enter your choice and press return: ";
-        cin >> choice;
-        cin.clear();
-        cin.get();
+    // do
+    // {
+    //     cout << CLEAR_SCREEN << HOME << endl
+    //          << " 1 - Play Wordle\n"
+    //          << " 2 - Display Statistics\n"
+    //          << " 3 - Exit\n\n"
+    //          << " Enter your choice and press return: ";
+    //     cin >> choice;
+    //     cin.clear();
+    //     cin.get();
 
-        switch (choice)
-        {
-        case 1:
-            playWordle();
-            break;
-        case 2:
-            showStatistics();
-            break;
-        case 3:
-            cout << "End of Program.\n";
-            break;
-        default:
-            cout << "Not a Valid Choice. \n"
-                 << "Choose again.\n";
-            break;
-        }
-    } while (choice != 3);
+    //     switch (choice)
+    //     {
+    //     case 1:
+    //         playWordle();
+    //         break;
+    //     case 2:
+    //         showStatistics();
+    //         break;
+    //     case 3:
+    //         cout << "End of Program.\n";
+    //         break;
+    //     default:
+    //         cout << "Not a Valid Choice. \n"
+    //              << "Choose again.\n";
+    //         break;
+    //     }
+    // } while (choice != 3);
+
+    vector<string> guesses = {"stain", "toner"};
+    printKeyboardHint(guesses, "trend");
+
+    // cout << dedupe("ajsadqwdjajdwida");
 
     return 0;
 }

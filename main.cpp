@@ -1,51 +1,30 @@
 #include <iostream>
 #include "wordle.h"
 
-#define CLEAR_SCREEN "\033[2J"
-#define HOME "\033[H"
-#define WORDLIST "wordlist.txt"
-#define ANSWERLIST "answerlist.txt"
-#define PLAYLOG "play.log"
+#define CLEAR "\033[2J"
+#define HOME "\033[;1H"
 
 using namespace std;
 
-int main()
+int main(int argc, char* argv[])
 {
-    int choice;
+    int choice = getMenuItem(); // <- Before the loop, to get the initial selection
 
-    do
+    while (choice != 3)
     {
-        cout << CLEAR_SCREEN << HOME << endl
-             << " 1 - Play Wordle\n"
-             << " 2 - Display Statistics\n"
-             << " 3 - Exit\n\n"
-             << " Enter your choice and press return: ";
-        cin >> choice;
-        cin.clear();
-        cin.get();
-
-        switch (choice)
+        if (choice == 1)
         {
-        case 1:
+            cout << CLEAR << HOME;
             playWordle();
-            break;
-        case 2:
-            showStatistics();
-            break;
-        case 3:
-            cout << "End of Program.\n";
-            break;
-        default:
-            cout << "Not a Valid Choice. \n"
-                 << "Choose again.\n";
-            break;
         }
-    } while (choice != 3);
+        else if (choice == 2)
+        {
+            cout << CLEAR << HOME;
+            showStatistics();
+        }
 
-    // vector<string> guesses = {"stain", "toner"};
-    // printKeyboardHint(guesses, "trend");
-
-    // cout << dedupe("ajsadqwdjajdwida");
+        choice = getMenuItem(); // <- At the end of the loop, to get the next
+    }
 
     return 0;
 }

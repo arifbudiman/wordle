@@ -1,12 +1,10 @@
 #ifndef WORDLE_H
 #define WORDLE_H
 
-#define GREEN "\033[92m"
-#define YELLOW "\033[93m"
-#define GREY "\033[90m"
+#define GREEN "\033[38;5;255m\033[48;5;2m"
+#define YELLOW "\033[38;5;255m\033[48;5;11m"
+#define GREY "\033[38;5;255m\033[48;5;240m"
 #define RESET "\033[0m"
-#define CLEAR_SCREEN "\033[2J"
-#define HOME "\033[H"
 
 #define CURSOR_DOWN_ONE_LEFT_FIVE "\033[1B\033[5D"
 #define CURSOR_UP_TWO "\033[2A"
@@ -24,9 +22,30 @@
 #include <iostream>
 #include <limits>
 
+void clearScreen()
+{
+    std::cout << "\033[2J\033[;1H" << RESET;
+}
+
+int getMenuItem()
+{
+    std::cin.clear();
+
+    clearScreen();
+
+    std::cout << "MENU:\n\n"
+              << "1 - Play Wordle\n"
+              << "2 - Display Statistics\n"
+              << "3 - Exit\n\n"
+              << "Enter your choice and press return: ";
+    int input;
+    std::cin >> input;
+    return input;
+}
+
 void showStatistics(std::string filename)
 {
-    std::cout << CLEAR_SCREEN << HOME;
+    clearScreen();
 
     int totalPlayed = 0;
     int totalWin = 0;
@@ -62,13 +81,18 @@ void showStatistics(std::string filename)
 
     percentWin = totalWin / (double)totalPlayed * 100;
 
-    std::cout << "Played: " << totalPlayed << std::endl;
-    std::cout << "Win: " << percentWin << "%" << std::endl;
-    std::cout << "Current streak: " << currentStreak << std::endl;
-    std::cout << "Max streak: " << maxStreak << std::endl << std::endl;
+    std::cout << "Played: " << totalPlayed << "\n"
+              << "Win: " << percentWin << "%\n"
+              << "Current streak: " << currentStreak << "\n"
+              << "Max streak: " << maxStreak << "\n\n"
+              << "Press enter to continue...";
 
-    std::cout << "Press Enter to Continue ";
-    std::cin.ignore();
+    // std::cin.clear();
+    // std::cin.ignore();
+
+    std::cin.sync();
+    std::cin.get();
+    clearScreen();
 }
 
 void showStatistics()
@@ -111,74 +135,76 @@ void logThePlay(std::string guessWord, bool isWinning, int numOfTries)
 
 std::string pickRandomWord(std::string filename)
 {
-    std::ifstream ifstream(filename);
-
+    std::ifstream file(filename);
     std::string line;
 
-    // count how many lines are in the file
-    int totalNumberOfLines = 0;
-    while (getline(ifstream, line))
+    if (file.is_open())
     {
-        totalNumberOfLines++;
-    }
-
-    // initialize random seed
-    srand (time(NULL));
-    // get a random number between 1 and totalNumberOfLines
-    int randomLineNumber = rand() % totalNumberOfLines + 1;
-
-    // clear any error states and set position in input sequence to 0 (the beginning of the file)
-    ifstream.clear();
-    ifstream.seekg(0);
-
-    // get the word in randomLineNumber
-    int currentLineNumber = 0;
-    while (getline(ifstream, line))
-    {
-        currentLineNumber++;
-        if (currentLineNumber == randomLineNumber)
+        // count how many lines are in the file
+        int totalNumberOfLines = 0;
+        while (getline(file, line))
         {
-            // just in case: transform the word to lowercase
-            std::transform(line.begin(), line.end(), line.begin(), ::tolower);
-            // close the file
-            ifstream.close();
-            // return the word
-            return line;
+            totalNumberOfLines++;
         }
+
+        // initialize random seed
+        srand(time(NULL));
+        // get a random number between 1 and totalNumberOfLines
+        int randomLineNumber = rand() % totalNumberOfLines + 1;
+
+        // clear any error states and set position in input sequence to 0 (the beginning of the file)
+        file.clear();
+        file.seekg(0);
+
+        // get the word in randomLineNumber
+        int currentLineNumber = 0;
+        while (getline(file, line))
+        {
+            currentLineNumber++;
+            if (currentLineNumber == randomLineNumber)
+            {
+                // just in case: transform the word to lowercase
+                std::transform(line.begin(), line.end(), line.begin(), ::tolower);
+                break;
+            }
+        }
+        file.close();
     }
 
-    // if we get here, that means there's something wrong (e.g. the random line number exceeds the max, etc.)
-    return "";
+    return line;
 }
 
 bool isValidGuess(std::string word, std::string fileName)
 {
-    // open the file
-    std::ifstream ifstream(fileName);
-
-    std::string line;
-    int currentLineNumber = 0;
-
     // transform to lowercase
     std::transform(word.begin(), word.end(), word.begin(), ::tolower);
 
-    // go line by line
-    while (getline(ifstream, line))
+    // open the file
+    std::ifstream file(fileName);
+
+    if (file.is_open())
     {
-        currentLineNumber++;
+        std::string line;
+        int currentLineNumber = 0;
 
-        // if the word is in this line
-        if (line.find(word, 0) != std::string::npos)
+        // go line by line
+        while (getline(file, line))
         {
-            // close the file
-            ifstream.close();
-            // the word is a valid guess
-            return true;
-        }
-    }
+            currentLineNumber++;
 
-    // close the file
-    ifstream.close();
+            // if the word is in this line
+            if (line.find(word, 0) != std::string::npos)
+            {
+                // close the file
+                file.close();
+                // the word is a valid guess
+                return true;
+            }
+        }
+
+        // close the file
+        file.close();
+    }
 
     // the word is not a valid guess
     return false;
@@ -192,10 +218,9 @@ bool isValidGuess(std::string word)
 void printHint(std::string guess, std::string answer)
 {
     std::string color;
-
     std::vector<char> charactersNotUsed;
 
-    for (int i = 0; i < guess.length(); i++)
+    for (size_t i = 0; i < guess.length(); i++)
     {
         // letter placed in the correct position
         if (guess[i] == answer[i])
@@ -214,8 +239,11 @@ void printHint(std::string guess, std::string answer)
             charactersNotUsed.push_back(guess[i]);
         }
 
-        std::cout << color << " --- "  << CURSOR_DOWN_ONE_LEFT_FIVE;
-        std::cout << "| " << guess[i] << " |"  << CURSOR_DOWN_ONE_LEFT_FIVE;
+        char upperCaseLetter = guess[i];
+        upperCaseLetter = toupper(upperCaseLetter);
+
+        std::cout << color << " --- " << CURSOR_DOWN_ONE_LEFT_FIVE;
+        std::cout << "| " << upperCaseLetter << " |" << CURSOR_DOWN_ONE_LEFT_FIVE;
         std::cout << " --- " << RESET;
 
         // if this is not the last character, put the cursor up 2 lines
@@ -226,16 +254,17 @@ void printHint(std::string guess, std::string answer)
         // otherwise (if this is the last character), put the cursor in the next line (put a line break)
         else
         {
-            std::cout << std::endl << std::endl;
+            std::cout << std::endl
+                      << std::endl;
         }
     }
 }
 
 void printHint(std::vector<std::string> guesses, std::string answer)
 {
-    std::cout << CLEAR_SCREEN << HOME;
+    clearScreen();
 
-    for (int i = 0; i < guesses.size(); i++)
+    for (size_t i = 0; i < guesses.size(); i++)
     {
         printHint(guesses[i], answer);
     }
@@ -256,24 +285,24 @@ void printKeyboardHint(std::vector<std::string> guesses, std::string answer)
 
     // get all letters that have been guessed and deduplicate them
     std::string allGuessedLetters;
-    for (int i = 0; i < guesses.size(); i++)
+    for (size_t i = 0; i < guesses.size(); i++)
     {
         allGuessedLetters += guesses[i];
     }
     allGuessedLetters = dedupe(allGuessedLetters);
 
     // get letters that have been guessed but are absent in the answer
-    for (int i = 0; i < allGuessedLetters.length(); i++)
+    for (size_t i = 0; i < allGuessedLetters.length(); i++)
     {
         if (answer.find(allGuessedLetters[i] == std::string::npos))
         {
             guessedAbsent.push_back(allGuessedLetters[i]);
         }
     }
-    
+
     // get correct letters and misplaced letters
     std::string lastGuess = guesses.back();
-    for (int i = 0; i < lastGuess.length(); i++)
+    for (size_t i = 0; i < lastGuess.length(); i++)
     {
         // correct letter
         if (lastGuess[i] == answer[i])
@@ -292,7 +321,7 @@ void printKeyboardHint(std::vector<std::string> guesses, std::string answer)
     // std::cout << CLEAR_SCREEN << HOME;
 
     // loop for keyboard rows
-    for (int i = 0; i < keys.size(); i++)
+    for (size_t i = 0; i < keys.size(); i++)
     {
         // if this is the 2nd row
         if (i == 1)
@@ -306,9 +335,9 @@ void printKeyboardHint(std::vector<std::string> guesses, std::string answer)
         }
 
         // loop for the all the letters in the current row
-        for (int j = 0; j < keys[i].length(); j++)
+        for (size_t j = 0; j < keys[i].length(); j++)
         {
-            // TODO: logic to determine color
+            // determine color
             std::string color;
             if (guessedCorrect.find(keys[i][j]) != std::string::npos)
             {
@@ -323,12 +352,15 @@ void printKeyboardHint(std::vector<std::string> guesses, std::string answer)
                 color = GREY;
             }
 
+            char upperCaseLetter = keys[i][j];
+            upperCaseLetter = toupper(upperCaseLetter);
+
             std::cout << color << " --- " << CURSOR_DOWN_ONE_LEFT_FIVE
-                << "| " << keys[i][j] << " |" << CURSOR_DOWN_ONE_LEFT_FIVE
-                << " --- " << RESET;
+                      << "| " << upperCaseLetter << " |" << CURSOR_DOWN_ONE_LEFT_FIVE
+                      << " --- " << RESET;
 
             // if this isn't the last charcter in the row
-            if (j < keys[i].length() -1)
+            if (j < keys[i].length() - 1)
             {
                 std::cout << CURSOR_UP_TWO;
             }
@@ -339,7 +371,7 @@ void printKeyboardHint(std::vector<std::string> guesses, std::string answer)
 
 void playWordle()
 {
-    std::cout << CLEAR_SCREEN << HOME;
+    clearScreen();
 
     std::string answer = pickRandomWord(ANSWERLIST);
 
@@ -391,9 +423,14 @@ void playWordle()
 
                 std::cout << "Guessed in " << guesses.size() << " tries." << std::endl;
 
-                system("pause");
-
-                return;
+                std::cout << "Press [enter] to continue";
+                std::string str;
+                std::getline(std::cin, str);
+                std::cin.ignore();
+                if (str == "")
+                {
+                    return;
+                }
             }
         }
     }
@@ -403,7 +440,14 @@ void playWordle()
 
     std::cout << "The answer is: " << answer << std::endl << std::endl;
 
-    system("pause");
+    std::cout << "Press [enter] to continue";
+    std::string str;
+    std::getline(std::cin, str);
+    std::cin.ignore();
+    if (str == "")
+    {
+        return;
+    }
 }
 
 #endif

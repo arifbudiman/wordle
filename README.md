@@ -1,4 +1,4 @@
-# wordle
+# Wordle
 
 ## Helpful resources:
 

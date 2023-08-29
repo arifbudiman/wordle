@@ -1,5 +1,7 @@
 # Wordle
 
+Wordle in C++, mostly to help my son learn the language.
+
 ## Helpful resources:
 
 - [ANSI Escape Sequences](https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797)

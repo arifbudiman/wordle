@@ -1,6 +1,6 @@
 # Wordle
 
-Wordle in C++, mostly to help my son learn the language.
+Wordle in C++, to help Nate learning the language.
 
 ## Helpful resources:
 

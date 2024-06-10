@@ -1,6 +1,6 @@
 # Wordle
 
-Wordle in C++, to help Nate learn C++. Uses basic C++ constructs.
+Wordle in C++, to help Nate learn the language.
 
 ## Helpful resources:
 
